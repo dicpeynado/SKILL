@@ -1,4 +1,4 @@
-% SKI language v2 with additional B and C combinators.
+% SKI language v2.2 with lambda calculus support.
 % B x y z = x (y z)
 % C x y z = x z y
 % def B : S (K S) K
@@ -23,7 +23,9 @@ lex.RPAREN = 7;
 lex.COLON = 8;
 lex.DEFINE = 9;
 lex.ID = 10;
-lex.NULL = 11;
+lex.LAMBDA = 11;
+lex.DOT = 12;
+lex.NULL = 13;
 
 function str = symbol2string(symbol, def)
     s = symbol;
@@ -50,6 +52,10 @@ function str = symbol2string(symbol, def)
         str = ":";
     elseif (s == d.DEFINE)
         str = "def";
+    elseif (s == d.LAMBDA)
+        str = "λ";
+    elseif (s == d.DOT)
+        str = ".";
     elseif (s == d.EOF)
         str = "EOF";
     else
@@ -89,6 +95,10 @@ function [sym text] = get(text, def)
         sym = def.RPAREN;
     elseif (ch == ':')
         sym = def.COLON;
+    elseif (ch == '^')
+        sym = def.LAMBDA
+    elseif (ch == '.')
+        sym = def.DOT;
     elseif (isletter(text.ch))
         start = text.pos;
         while (isletter(text.ch) || isasciinum(text.ch))
@@ -135,6 +145,7 @@ end
 % E'= F E'|
 % A = F F E'|F (A)| 
 % F = s|k|i|b|c|id
+% L = 
 
 function [b text p] = parse(text, def)
     [sym t1] = get(text,def);
